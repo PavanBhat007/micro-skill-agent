@@ -1,9 +1,34 @@
+import { getDb } from "@/lib/mongodb";
+import { formatDate } from "@/lib/utils";
 import { groq } from "@ai-sdk/groq";
+import { auth } from "@clerk/nextjs/server";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
 
 export async function POST() {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const today = formatDate(new Date());
+    const db = await getDb();
+
+    const existingSkill = await db.collection("skills").findOne({
+      userId,
+      date: today,
+    });
+
+    if (existingSkill) {
+      return NextResponse.json(
+        {
+          skill: existingSkill,
+        },
+        { status: 200 },
+      );
+    }
+
     const { text } = await generateText({
       model: groq("llama-3.1-8b-instant"),
       prompt: `
@@ -17,9 +42,35 @@ export async function POST() {
       `,
     });
 
+    // LLM Response Parsing
+    const titleMatch = text.match(/Title:\s*(.+)/);
+    const descriptionMatch = text.match(
+      /Description:\s*([\s\S]+?)(?=Category:|$)/,
+    );
+    const categoryMatch = text.match(/Category:\s*(.+)/);
+
+    const title = titleMatch?.[1]?.trim() || "Untitled Skill";
+    const description = descriptionMatch?.[1]?.trim() || text;
+    const category = categoryMatch?.[1]?.trim() || "General";
+
+    const newSkill = {
+      userId,
+      date: today,
+      title,
+      description,
+      category,
+      completed: false,
+      createdAt: new Date(),
+    };
+
+    const result = await db.collection("skills").insertOne(newSkill);
+
     return NextResponse.json(
       {
-        skill: text,
+        skill: {
+          ...newSkill,
+          _id: result.insertedId,
+        },
       },
       { status: 200 },
     );

@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb"
+import { Db, MongoClient } from "mongodb"
 
 const uri = process.env.MONGODB_URI
 const options = {}
@@ -18,3 +18,8 @@ try {
 }
 
 export default clientPromise;
+
+export async function getDb(): Promise<Db> {
+  const client = await clientPromise;
+  return client.db("micro-skill-agent")
+}
