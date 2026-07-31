@@ -5,6 +5,44 @@ import { auth } from "@clerk/nextjs/server";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
 
+export async function GET() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const today = formatDate(new Date());
+    const db = await getDb();
+
+    const skill = await db.collection("skills").findOne({
+      userId,
+      date: today,
+    });
+
+    if (skill) {
+      return NextResponse.json({ skill: skill }, { status: 200 });
+    } else {
+      return NextResponse.json(
+        {
+          skill: null,
+          message: "No skill generated for today, generate a skill",
+        },
+        { status: 400 },
+      );
+    }
+  } catch (error) {
+    console.error("Error generating skill: ", error);
+    return NextResponse.json(
+      {
+        error: "Failed to fetch skill",
+        errorDetails: error,
+      },
+      { status: 500 },
+    );
+  }
+}
+
 export async function POST() {
   try {
     const { userId } = await auth();
