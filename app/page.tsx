@@ -2,6 +2,7 @@ import { SignInButton, SignUpButton, UserButton, Show } from "@clerk/nextjs";
 import updateProfileAction from "@/actions/update-profile.action";
 import InputField from "@/components/InputField";
 import SkillOfTheDaySection from "@/components/SkillOfTheDay";
+import UserProfile from "@/components/UserProfile";
 
 export default function Home() {
   return (
@@ -47,22 +48,7 @@ export default function Home() {
           User Profile
         </h2>
 
-        <form
-          action={updateProfileAction}
-          className="px-6 py-8 flex flex-col gap-4"
-        >
-          <InputField name="role" label="Role" />
-          <InputField name="techStack" label="Tech Stack" />
-          <InputField name="goals" label="Goals" />
-          <InputField name="level" label="Level" />
-
-          <button
-            type="submit"
-            className="bg-amber-100 border border-orange-300 rounded w-fit px-4 py-1 text-amber-500 font-semibold cursor-pointer hover:bg-orange-300 hover:text-amber-50 transition-colors duration-300"
-          >
-            Update Profile
-          </button>
-        </form>
+        <UserProfile />
       </div>
 
       <div className="w-full">

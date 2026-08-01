@@ -87,7 +87,11 @@ export default function SkillOfTheDaySection() {
           disabled={loading}
           className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-semibold px-6 py-2.5 rounded transition-colors"
         >
-          {loading ? "Generating" : "Get Today's SKILL"}
+          {isSignedIn
+            ? loading
+              ? "Generating"
+              : "Get Today's SKILL"
+            : "Login to continue"}
         </button>
       )}
 
@@ -99,7 +103,7 @@ export default function SkillOfTheDaySection() {
             <span className="text-sm font-medium px-3 py-1 bg-orange-100 text-orange-700 rounded-full">
               {skill.category}
             </span>
-            
+
             {!skill.completed ? (
               <span>
                 <button
@@ -115,7 +119,6 @@ export default function SkillOfTheDaySection() {
                 ✓ Completed
               </span>
             )}
-            
           </div>
 
           <h3 className="text-2xl font-[oswald] font-bold text-gray-900 mb-3">
