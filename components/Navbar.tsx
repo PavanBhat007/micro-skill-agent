@@ -1,24 +1,29 @@
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-import { Calendar, LinkIcon } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 bg-linear-to-br from-amber-50 via-white to-amber-100 text-gray-950 w-full border border-amber-300 shadow-sm shadow-amber-300 px-6 py-2">
-      <div className="flex justify-between items-start">
-        <Link href="/" title="Home">
-          <h1 className="font-[poppins] font-bold text-3xl">MICRO SKILL AGENT</h1>
+    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-stone-200 px-4 sm:px-6 py-3 shadow-xs transition-colors">
+      <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
+        {/* Brand Logo */}
+        <Link href="/" title="Home" className="group flex items-center gap-2">
+          <h1 className="font-[poppins] font-bold text-lg sm:text-xl text-stone-800 tracking-tight group-hover:text-indigo-600 transition-colors">
+            MICRO SKILL AGENT
+          </h1>
         </Link>
 
-        <div className="flex items-center gap-3">
+        {/* Navigation & Auth Controls */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button className="px-4 py-1.5 border border-orange-400 rounded text-orange-600 font-medium hover:bg-orange-50">
-                Login
+              <button className="px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200">
+                Log In
               </button>
             </SignInButton>
+
             <SignUpButton mode="modal">
-              <button className="px-4 py-1.5 bg-orange-500 text-white rounded font-medium hover:bg-orange-600">
+              <button className="px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-xs transition-all duration-200">
                 Sign Up
               </button>
             </SignUpButton>
@@ -28,18 +33,29 @@ export default function Navbar() {
             <Link
               href="/calendar"
               title="View Calendar"
-              className="text-sm font-medium text-amber-500 hover:text-amber-600 mr-2 transition-all duration-300"
+              className="p-2 text-stone-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
             >
-              <Calendar className="w-5 h-5 hover:fill-amber-100 transition-colors duration-300" />
+              <Calendar className="w-5 h-5" />
             </Link>
+
             <Link
               href="/profile"
               title="View Profile"
-              className="text-sm font-medium text-amber-500 hover:text-amber-600 mr-2 transition-all duration-300"
+              className="p-2 text-stone-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
             >
-              <LinkIcon className="w-5 h-5 hover:fill-amber-100 transition-colors duration-300" />
+              <User className="w-5 h-5" />
             </Link>
-            <UserButton />
+
+            <div className="pl-1 flex items-center">
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox:
+                      "w-8 h-8 ring-2 ring-stone-200 hover:ring-indigo-300 transition-all",
+                  },
+                }}
+              />
+            </div>
           </Show>
         </div>
       </div>

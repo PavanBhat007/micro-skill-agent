@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600"]
+  weight: ["400", "500", "600", "700"],
 });
 
 const inter = Inter({
@@ -31,10 +31,11 @@ export default function RootLayout({
         lang="en"
         className={`${poppins.variable} ${inter.variable} h-full antialiased`}
       >
-        <body className="min-h-full flex flex-col">
+        <body className="min-h-full flex flex-col bg-stone-50 text-stone-800 selection:bg-indigo-100 selection:text-indigo-700">
           <Navbar />
-
-          <main className="flex-1 w-full">{children}</main>
+          <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6">
+            {children}
+          </main>
         </body>
       </html>
     </ClerkProvider>
