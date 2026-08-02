@@ -1,8 +1,22 @@
 import CalendarView from "@/components/CalendarView";
+import { getDb } from "@/lib/mongodb";
+import { auth } from "@clerk/nextjs/server";
 import { Home } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function CalendarPage() {
+export default async function CalendarPage() {
+  const { userId } = await auth();
+
+  if (userId) {
+    const db = await getDb();
+    const profile = await db.collection("users").findOne({ userId });
+
+    if (!profile || profile.onboardingCompleted !== true) {
+      redirect("/onboarding")
+    }
+  }
+  
   return (
     <div className="w-full">
       <div className="w-full flex items-center gap-3 justify-between p-6 border-b border-orange-400 bg-linear-to-t from-orange-100 via-white to-orange-50">
