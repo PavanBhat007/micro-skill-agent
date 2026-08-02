@@ -2,7 +2,14 @@
 
 import { Skill } from "@/types/skill";
 import axios from "axios";
-import { Check, ChevronLeft, ChevronRight, Timer, X } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  X,
+  Loader2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function CalendarView() {
@@ -11,9 +18,7 @@ export default function CalendarView() {
   const [error, setError] = useState("");
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-  const [skillModalOpen, setSkillModalOpen] = useState(
-    selectedSkill ? true : false,
-  );
+  const [skillModalOpen, setSkillModalOpen] = useState(false);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -28,11 +33,10 @@ export default function CalendarView() {
           `/api/skills/months?year=${year}&month=${month + 1}`,
         );
 
-        console.log(res.data);
         setSkills(res.data.skills || []);
       } catch (err) {
         console.error("Failed to fetch skills: ", err);
-        setError("Failed to fetch skills!");
+        setError("Failed to load skills for this month");
       } finally {
         setLoading(false);
       }
@@ -61,7 +65,7 @@ export default function CalendarView() {
     "December",
   ];
 
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const switchToPrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -73,10 +77,9 @@ export default function CalendarView() {
 
   const days: (number | null)[] = [];
   for (let i = 0; i < startingDayOfWeek; i++) {
-    days.push(null); // null for days before starting day
+    days.push(null);
   }
 
-  // after startingDayOfWeek, until end of month
   for (let day = 1; day <= daysInMonth; day++) {
     days.push(day);
   }
@@ -88,52 +91,61 @@ export default function CalendarView() {
     year === today.getFullYear();
 
   const getSkillForDay = (day: number) => {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return skills ? skills?.find((s) => s.date === dateStr) : null;
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
+      day,
+    ).padStart(2, "0")}`;
+    return skills ? skills.find((s) => s.date === dateStr) : null;
   };
 
   return (
-    <div>
-      {/* ===== Calendar ===== */}
-      <div className="bg-white rounded-xl border border-orange-200 shadow-sm overflow-hidden">
-        {/* Month Navigation */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-orange-100">
+    <div className="w-full space-y-4">
+      {/* Calendar Card */}
+      <div className="bg-white border border-stone-200 rounded-2xl shadow-xs overflow-hidden">
+        {/* Month Navigation Bar */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 bg-stone-50/50">
           <button
             onClick={switchToPrevMonth}
             disabled={loading}
-            className="p-2 rounded-full hover:bg-orange-50 transition-colors duration-300"
+            className="p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 transition-colors cursor-pointer disabled:opacity-40"
           >
-            <ChevronLeft className="w-5 h-5 text-orange-600" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <h3 className="font-[poppins] text-xl text-gray-900 font-semibold">
-            {monthNames[month]} {year}
-          </h3>
+
+          <div className="flex items-center gap-2">
+            <h3 className="font-[poppins] text-lg sm:text-xl text-stone-800 font-bold">
+              {monthNames[month]} {year}
+            </h3>
+            {loading && (
+              <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
+            )}
+          </div>
+
           <button
             onClick={switchToNextMonth}
             disabled={loading}
-            className="p-2 rounded-full hover:bg-orange-50 transition-colors duration-300"
+            className="p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 transition-colors cursor-pointer disabled:opacity-40"
           >
-            <ChevronRight className="w-5 h-5 text-orange-600" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-  
-        {/* Weekday names */}
-        <div className="grid grid-cols-7 border-b border-orange-100">
+
+        {/* Weekday Labels Header */}
+        <div className="grid grid-cols-7 border-b border-stone-200 bg-stone-50 text-center">
           {dayNames.map((day) => (
             <div
               key={day}
-              className="py-3 text-center text-sm font-medium text-orange-700"
+              className="py-2.5 text-xs font-semibold text-stone-500 uppercase tracking-wider"
             >
               {day}
             </div>
           ))}
         </div>
-  
-        {/* Days grid */}
-        <div className="grid grid-cols-7">
+
+        {/* Grid Days */}
+        <div className="grid grid-cols-7 divide-x divide-y divide-stone-100">
           {days.map((day, index) => {
             const skill = day ? getSkillForDay(day) : null;
-  
+
             return (
               <div
                 key={index}
@@ -143,31 +155,35 @@ export default function CalendarView() {
                     setSkillModalOpen(true);
                   }
                 }}
-                className={`min-h-20 p-2 border-b border-r border-orange-50 relative ${
+                className={`min-h-16 sm:min-h-20 p-2 relative transition-all ${
                   day
-                    ? "hover:bg-orange-50 cursor-pointer transition-colors duration-300"
-                    : ""
+                    ? skill
+                      ? "hover:bg-indigo-50/50 cursor-pointer"
+                      : "hover:bg-stone-50"
+                    : "bg-stone-50/30"
                 }`}
               >
                 {day && (
                   <>
                     <div
-                      className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                         isToday(day)
-                          ? "bg-orange-500 text-white font-semibold"
-                          : "bg-white text-gray-800 font-medium"
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-stone-700"
                       }`}
                     >
                       {day}
                     </div>
-  
-                    {/* Dot - now correctly positioned inside the cell */}
+
+                    {/* Skill Indicator Badge */}
                     {skill && (
-                      <div
-                        className={`absolute bottom-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full ${
-                          skill.completed ? "bg-green-500" : "bg-orange-400"
-                        }`}
-                      />
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            skill.completed ? "bg-emerald-600" : "bg-amber-500"
+                          }`}
+                        />
+                      </div>
                     )}
                   </>
                 )}
@@ -177,63 +193,69 @@ export default function CalendarView() {
         </div>
       </div>
 
-      {error && <p className="my-2 text-red-600 font-semibold italic">{error}</p>}
-  
-      {/* ===== Modal ===== */}
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-medium rounded-xl">
+          {error}
+        </div>
+      )}
+
+      {/* Detail Modal */}
       {skillModalOpen && selectedSkill && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-stone-900/40 backdrop-blur-xs transition-opacity"
             onClick={() => {
               setSelectedSkill(null);
               setSkillModalOpen(false);
             }}
           />
-  
-          {/* Modal content */}
-          <div className="relative w-full max-w-lg bg-white border border-orange-200 rounded-xl shadow-xl p-6 z-10">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium px-3 py-1 bg-orange-100 text-orange-700 rounded-full">
+
+          {/* Modal Card */}
+          <div className="relative w-full max-w-lg bg-white border border-stone-200 rounded-2xl shadow-xl p-5 sm:p-6 z-10 space-y-4">
+            {/* Header Tag and Close Button */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg">
                   {selectedSkill.category}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-xs font-medium text-stone-500">
                   {selectedSkill.date}
                 </span>
               </div>
-  
+
               <button
                 onClick={() => {
                   setSelectedSkill(null);
                   setSkillModalOpen(false);
                 }}
-                className="p-1.5 rounded-full hover:bg-orange-50 transition-colors"
+                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5 text-orange-500" />
+                <X className="w-5 h-5" />
               </button>
             </div>
-  
-            {/* Body */}
-            <h3 className="text-2xl font-[poppins] font-bold text-gray-900 mb-3">
-              {selectedSkill.title}
-            </h3>
-  
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line mb-5">
-              {selectedSkill.description}
-            </p>
-  
-            {/* Status */}
+
+            {/* Title & Description */}
             <div>
+              <h3 className="text-xl font-[poppins] font-bold text-stone-800 mb-2">
+                {selectedSkill.title}
+              </h3>
+
+              <p className="text-stone-600 text-sm leading-relaxed whitespace-pre-line">
+                {selectedSkill.description}
+              </p>
+            </div>
+
+            {/* Completion Status Chip */}
+            <div className="pt-2 border-t border-stone-100">
               {selectedSkill.completed ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-sm text-green-800 font-medium">
-                  <Check className="w-4 h-4" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   Completed
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-full text-sm text-orange-700 font-medium">
-                  <Timer className="w-4 h-4" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-xs font-semibold">
+                  <Clock className="w-4 h-4 text-amber-600" />
                   Not Completed
                 </span>
               )}
