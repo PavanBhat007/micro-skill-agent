@@ -74,24 +74,15 @@ export default async function Home() {
             Skill of the Day
           </h2>
 
-          <div className="flex items-center gap-1">
-            <Link
-              href="/calendar"
-              title="View Calendar"
-              className="p-2 rounded-full hover:bg-stone-100 transition-colors duration-300"
-            >
-              <Calendar className="w-5 h-5 text-stone-500" />
-            </Link>
-            <Link
-              href="/profile"
-              title="View Profile"
-              className="p-2 rounded-full hover:bg-stone-100 transition-colors duration-300"
-            >
-              <User className="w-5 h-5 text-stone-500" />
-            </Link>
-          </div>
+          <Link
+            href="/calendar"
+            title="View Calendar"
+            className="p-2 rounded-full hover:bg-stone-100 transition-colors duration-300"
+          >
+            <Calendar className="w-5 h-5 text-stone-500" />
+          </Link>
         </div>
-        
+
         <SkillOfTheDaySection />
       </div>
     </div>

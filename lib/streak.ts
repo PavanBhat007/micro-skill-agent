@@ -7,8 +7,6 @@ export function calculateStreak(skills: Skill[]): number {
   const completed = skills.filter((skill) => skill.completed).map((skill) => skill.date).sort((a, b) => (a < b ? 1 : -1))
   if (completed.length === 0) return 0;
 
-  console.log(skills, completed)
-
   let today: string | Date = new Date();
   let yesterday: string | Date = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);

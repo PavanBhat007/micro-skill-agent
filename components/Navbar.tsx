@@ -1,4 +1,6 @@
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { LinkIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
@@ -32,6 +34,9 @@ export default function Navbar() {
           </Show>
 
           <Show when="signed-in">
+            <Link href="/profile" className="text-sm font-medium text-stone-600 hover:text-stone-900 mr-2 transition-colors duration-300">
+              <LinkIcon className="w-5 h-5" />
+            </Link>
             <UserButton />
           </Show>
         </div>
