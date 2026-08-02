@@ -2,7 +2,15 @@ import { getDb } from "@/lib/mongodb";
 import { calculateStreak } from "@/lib/streak";
 import { Skill } from "@/types/skill";
 import { auth } from "@clerk/nextjs/server";
-import { Flame, Home, PencilSparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  Flame,
+  Pencil,
+  Target,
+  Sparkles,
+  UserCheck,
+  Tag,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -24,79 +32,144 @@ export default async function ProfilePage() {
     .toArray()) as unknown as Skill[];
   const streak = calculateStreak(skills);
 
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="font-[poppins] text-2xl font-bold text-stone-800">
-          Your Profile
-        </h2>
-        <div className="flex items-center gap-3">
+    <div className="w-full max-w-3xl mx-auto space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs">
+        <div>
+          <h2 className="font-[poppins] font-bold text-2xl sm:text-3xl text-stone-800 tracking-tight">
+            User Profile
+          </h2>
+          <p className="text-sm text-stone-600 mt-0.5">
+            Manage your learning trajectory, goals, and preferences.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
           <Link
             href="/"
-            title="Go Home"
-            className="p-2 rounded-full hover:bg-stone-100 transition-colors duration-300"
+            title="Back to Home"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
           >
-            <Home className="w-5 h-5 text-stone-500" />
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Home</span>
           </Link>
+
           <Link
             href="/onboarding"
             title="Edit Profile"
-            className="p-2 rounded-full hover:bg-stone-100 transition-colors duration-300"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition-colors"
           >
-            <PencilSparkles className="w-5 h-5 text-stone-500" />
+            <Pencil className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Edit Profile</span>
           </Link>
         </div>
       </div>
 
-      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-stone-100 bg-linear-to-r from-stone-50 to-white">
-          <h2 className="font-[poppins] text-2xl font-bold text-stone-800">
-            {profile.name}
-          </h2>
-          <p className="text-stone-500 mt-1">{profile.role}</p>
+      {/* Main Profile Card */}
+      <div className="bg-white border border-stone-200 rounded-2xl shadow-xs overflow-hidden divide-y divide-stone-100">
+        {/* User Identity Header */}
+        <div className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-stone-50/40">
+          <div className="flex items-center gap-4">
+            {/* User Avatar */}
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-700 font-[poppins] font-bold text-xl flex items-center justify-center shrink-0 shadow-xs">
+              {getInitials(profile.name)}
+            </div>
 
-          <div className="flex items-center gap-3 mt-4">
+            <div>
+              <h3 className="font-[poppins] text-2xl font-bold text-stone-800">
+                {profile.name}
+              </h3>
+              <p className="text-stone-600 font-medium text-sm mt-0.5">
+                {profile.role || "Learner"}
+              </p>
+            </div>
+          </div>
+
+          {/* User Badges */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Level Pill */}
             <span
-              className={`px-3 py-1 rounded-full text-xs font-medium ${profile.level === "Beginner" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : profile.level === "Intermediate" ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200" : "bg-rose-50 text-rose-700 ring-1 ring-rose-200"}`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${
+                profile.level === "Beginner"
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : profile.level === "Intermediate"
+                    ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                    : "bg-purple-50 text-purple-700 border-purple-200"
+              }`}
             >
-              {profile.level}
+              <UserCheck className="w-3.5 h-3.5" />
+              {profile.level || "Beginner"}
             </span>
 
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-medium ring-1 ring-orange-100">
-              <Flame className="w-3.5 h-3.5" />
-              {streak} day{streak !== 1 ? "s" : ""} streak
+            {/* Streak Counter */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold">
+              <Flame className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
+              {streak} Day{streak !== 1 ? "s" : ""} Streak
             </div>
           </div>
         </div>
 
-        <div className="p-6 border-b border-stone-100">
-          <h3 className="text-sm font-medium text-stone-500 mb-3">Interests</h3>
+        {/* Interests Section */}
+        <div className="p-6 space-y-3">
+          <div className="flex items-center gap-2 text-stone-800 font-semibold text-sm">
+            <Tag className="w-4 h-4 text-indigo-600" />
+            <span>Interests & Focus Areas</span>
+          </div>
+
           {profile.interests && profile.interests.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 pt-1">
               {profile.interests.map((interest: string) => (
-                <span key={interest} className="px-3 py-1.5 bg-stone-100 text-stone-700 rounded-full text-sm">
+                <span
+                  key={interest}
+                  className="px-3 py-1.5 bg-stone-100 border border-stone-200/80 text-stone-700 rounded-xl text-xs font-semibold"
+                >
                   {interest}
                 </span>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-stone-400">No Interests added yet</p>
+            <p className="text-xs text-stone-500 italic">
+              No interests specified yet. Click edit to customize.
+            </p>
           )}
         </div>
 
-        <div className="p-6">
-          <h3 className="text-sm font-medium text-stone-500 mb-3">Goals</h3>
+        {/* Goals Section */}
+        <div className="p-6 space-y-3">
+          <div className="flex items-center gap-2 text-stone-800 font-semibold text-sm">
+            <Target className="w-4 h-4 text-emerald-600" />
+            <span>Active Growth Goals</span>
+          </div>
+
           {profile.goals && profile.goals.length > 0 ? (
-            <ul className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
               {profile.goals.map((goal: string) => (
-                <li key={goal} className="flex items-center gap-2 text-sm text-stone-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  {goal}
-                </li>
+                <div
+                  key={goal}
+                  className="flex items-start gap-2.5 p-3 bg-stone-50/60 border border-stone-200 rounded-xl"
+                >
+                  <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                  <span className="text-xs font-medium text-stone-700 leading-snug">
+                    {goal}
+                  </span>
+                </div>
               ))}
-            </ul>
-          ): (
-            <p className="text-sm text-stone-400">No Goals added yet</p>
+            </div>
+          ) : (
+            <p className="text-xs text-stone-500 italic">
+              No specific goals set yet.
+            </p>
           )}
         </div>
       </div>
