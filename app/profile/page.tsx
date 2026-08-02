@@ -27,7 +27,7 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="font-[oswald] text-2xl font-bold text-stone-800">
+        <h2 className="font-[poppins] text-2xl font-bold text-stone-800">
           Your Profile
         </h2>
         <div className="flex items-center gap-3">
@@ -50,7 +50,7 @@ export default async function ProfilePage() {
 
       <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
         <div className="p-6 border-b border-stone-100 bg-linear-to-r from-stone-50 to-white">
-          <h2 className="font-[oswald] text-2xl font-bold text-stone-800">
+          <h2 className="font-[poppins] text-2xl font-bold text-stone-800">
             {profile.name}
           </h2>
           <p className="text-stone-500 mt-1">{profile.role}</p>

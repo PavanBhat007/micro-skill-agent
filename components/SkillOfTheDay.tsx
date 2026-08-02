@@ -80,7 +80,7 @@ export default function SkillOfTheDaySection() {
   };
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-6 w-full max-w-3xl mx-auto">
       {!skill && (
         <button
           onClick={generateSkill}
@@ -121,7 +121,7 @@ export default function SkillOfTheDaySection() {
             )}
           </div>
 
-          <h3 className="text-2xl font-[oswald] font-bold text-gray-900 mb-3">
+          <h3 className="text-2xl font-[poppins] font-bold text-gray-900 mb-3">
             {skill.title}
           </h3>
 

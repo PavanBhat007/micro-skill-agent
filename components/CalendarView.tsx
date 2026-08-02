@@ -105,7 +105,7 @@ export default function CalendarView() {
           >
             <ChevronLeft className="w-5 h-5 text-orange-600" />
           </button>
-          <h3 className="font-[oswald] text-xl text-gray-900 font-semibold">
+          <h3 className="font-[poppins] text-xl text-gray-900 font-semibold">
             {monthNames[month]} {year}
           </h3>
           <button
@@ -216,7 +216,7 @@ export default function CalendarView() {
             </div>
   
             {/* Body */}
-            <h3 className="text-2xl font-[oswald] font-bold text-gray-900 mb-3">
+            <h3 className="text-2xl font-[poppins] font-bold text-gray-900 mb-3">
               {selectedSkill.title}
             </h3>
   

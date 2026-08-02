@@ -20,7 +20,7 @@ export default async function CalendarPage() {
   return (
     <div className="w-full">
       <div className="w-full flex items-center gap-3 justify-between p-6 border-b border-orange-400 bg-linear-to-t from-orange-100 via-white to-orange-50">
-        <h2 className="font-[oswald] font-semibold text-3xl">Calendar</h2>
+        <h2 className="font-[poppins] font-semibold text-3xl">Calendar</h2>
 
         <Link
           href="/"

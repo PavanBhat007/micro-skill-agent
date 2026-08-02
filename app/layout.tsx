@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Oswald, Inter } from "next/font/google";
+import { Poppins, Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
-const oswald = Oswald({
-  variable: "--font-oswald",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600"]
 });
 
 const inter = Inter({
@@ -28,7 +29,7 @@ export default function RootLayout({
     <ClerkProvider afterSignOutUrl="/">
       <html
         lang="en"
-        className={`${oswald.variable} ${inter.variable} h-full antialiased`}
+        className={`${poppins.variable} ${inter.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col">
           <Navbar />

@@ -209,7 +209,7 @@ export default function OnboardingFlow() {
     <div className="max-w-2xl mx-auto px-6 py-12">
       {/* Header */}
       <div className="mb-10 text-center">
-        <h2 className="font-[oswald] text-3xl font-bold text-stone-800">
+        <h2 className="font-[poppins] text-3xl font-bold text-stone-800">
           {name ? (
             <>
               Hi <span className="text-orange-600">{name}</span>
