@@ -1,7 +1,7 @@
 import CalendarView from "@/components/CalendarView";
 import { getDb } from "@/lib/mongodb";
 import { auth } from "@clerk/nextjs/server";
-import { Home } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -13,26 +13,33 @@ export default async function CalendarPage() {
     const profile = await db.collection("users").findOne({ userId });
 
     if (!profile || profile.onboardingCompleted !== true) {
-      redirect("/onboarding")
+      redirect("/onboarding");
     }
   }
-  
+
   return (
-    <div className="w-full">
-      <div className="w-full flex items-center gap-3 justify-between p-6 border-b border-orange-400 bg-linear-to-t from-orange-100 via-white to-orange-50">
-        <h2 className="font-[oswald] font-semibold text-3xl">Calendar</h2>
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center justify-between bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs">
+        <div>
+          <h2 className="font-[poppins] font-bold text-2xl sm:text-3xl text-stone-800 tracking-tight">
+            Skill Calendar
+          </h2>
+          <p className="text-sm text-stone-600 mt-0.5">
+            Track your daily consistency and revisit past micro-skills.
+          </p>
+        </div>
 
         <Link
           href="/"
-          className="p-2 rounded-full hover:bg-orange-100 transition-colors duration-300"
+          className="inline-flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
+          title="Back to Home"
         >
-          <Home className="w-5 h-5 text-orange-600" />
+          <ArrowLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Home</span>
         </Link>
       </div>
 
-      <div className="p-6 max-w-4xl w-full mx-auto">
-        <CalendarView />
-      </div>
+      <CalendarView />
     </div>
   );
 }
