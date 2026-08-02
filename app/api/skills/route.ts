@@ -53,6 +53,7 @@ export async function POST() {
     const today = formatDate(new Date());
     const db = await getDb();
 
+    // if skill already generated today, resend the same instead of new
     const existingSkill = await db.collection("skills").findOne({
       userId,
       date: today,
@@ -67,19 +68,71 @@ export async function POST() {
       );
     }
 
-    const { text } = await generateText({
+    // personalize skill generation based on user profile and skills completed already
+    const profile = await db.collection("users").findOne({ userId });
+    const recentSkills = await db
+      .collection("skills")
+      .find({ userId, completed: true })
+      .sort({ date: -1 })
+      .limit(15)
+      .toArray();
+    const skillContext = recentSkills.map((skill) => skill.title).filter(Boolean)
+
+    // custom user-profile based prompt
+    const prompt = `
+    You are an expert personal coach that creates highly practical micro-skills.
+    
+    Generate exactly ONE new micro-skill the user can practice today.
+    
+    USER PROFILE:
+    - Name: ${profile?.name || "User"}
+    - Role: ${profile?.role || "Not specified"}
+    - Level: ${profile?.level || "Beginner"}
+    - Interests: ${profile?.interests?.length ? profile.interests.join(", ") : "General self-improvement"}
+    - Goals: ${profile?.goals?.length ? profile.goals.join(", ") : "Improve a little every day"}
+    
+    RECENTLY COMPLETED SKILLS (do not repeat any of these):
+    ${skillContext.length > 0 ? skillContext.map((t) => `- ${t}`).join("\n") : "- None yet"}
+    
+    RULES:
+    1. Generate exactly ONE skill.
+    2. The skill must be practical and completable in 15–30 minutes.
+    3. Strongly match the user's Interests and Goals.
+    4. Match the difficulty to the user's Level.
+    5. If previous skills exist, make this a natural next step (progressive learning).
+    6. Never repeat a completed skill (even if worded differently).
+    7. Rotate categories when possible (don't stay in only one category).
+    8. Be specific and actionable (tell the user exactly what to do).
+    9. You may mention well-known free resources (books, docs, or official sites) only if you are confident they exist. Do not invent links.
+    10. Keep the core practice under 30 minutes. The user can go deeper later if they want.
+    
+    IMPORTANT:
+    - Do NOT use markdown.
+    - Do NOT use bold, italics, bullet points, or extra symbols.
+    - Follow the output format EXACTLY.
+    
+    OUTPUT FORMAT (copy this structure exactly):
+    
+    Title: short clear title here
+    Description: 3-5 sentences explaining the skill and exactly how to practice it today. Include concrete steps.
+    Category: OneWord
+    `.trim();
+    
+    console.log(prompt)
+
+    let { text } = await generateText({
       model: groq("llama-3.1-8b-instant"),
-      prompt: `
-        Generate one small, practical micro-skill that a person can learn and practice in under 15 minutes today.
-
-        Return the response in this exact format:
-
-        Title: [short title]
-        Description: [2-3 sentences explaining the skill and how to practice it]
-        Category: [one word category like Productivity, Communication, Coding, Health, etc.]
-      `,
+      prompt,
+      temperature: 0.6
     });
 
+    // Clean common markdown artifacts
+    text = text
+      .replace(/\*\*/g, "")
+      .replace(/\*/g, "")
+      .replace(/`/g, "")
+      .trim();
+    
     // LLM Response Parsing
     const titleMatch = text.match(/Title:\s*(.+)/);
     const descriptionMatch = text.match(
