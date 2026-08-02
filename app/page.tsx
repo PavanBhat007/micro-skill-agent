@@ -120,7 +120,7 @@ export default async function Home() {
         {userId && (
           <div className="mt-6 pt-5 border-t border-stone-100">
             <div className="flex items-center justify-between text-xs font-semibold text-stone-500 mb-3">
-              <span>THIS WEEK'S PROGRESS</span>
+              <span>THIS WEEK&apos;S PROGRESS</span>
               <span className="text-stone-700">
                 {completedTotal} total{" "}
                 {completedTotal === 1 ? "skill" : "skills"} completed
