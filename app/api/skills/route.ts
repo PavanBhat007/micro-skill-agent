@@ -117,11 +117,10 @@ export async function POST() {
     Description: 3-5 sentences explaining the skill and exactly how to practice it today. Include concrete steps.
     Category: OneWord
     `.trim();
-    
-    console.log(prompt)
 
+    const model = process.env.MODEL_USED || "openai/gpt-oss-20b"
     let { text } = await generateText({
-      model: groq("llama-3.1-8b-instant"),
+      model: groq(model),
       prompt,
       temperature: 0.6
     });
